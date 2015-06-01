@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A6842E31B1C213600D289D8 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A6842E21B1C213600D289D8 /* MapKit.framework */; };
+		5A6842E71B1C224300D289D8 /* Header.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A6842E61B1C224300D289D8 /* Header.png */; };
+		5A6842E91B1C251F00D289D8 /* Button.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A6842E81B1C251F00D289D8 /* Button.png */; };
 		5A7EA6FB1B1B6A1300C4F2EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7EA6FA1B1B6A1300C4F2EB /* main.m */; };
 		5A7EA6FE1B1B6A1300C4F2EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7EA6FD1B1B6A1300C4F2EB /* AppDelegate.m */; };
 		5A7EA7011B1B6A1300C4F2EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7EA7001B1B6A1300C4F2EB /* ViewController.m */; };
@@ -28,6 +31,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A6842E21B1C213600D289D8 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		5A6842E61B1C224300D289D8 /* Header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Header.png; sourceTree = "<group>"; };
+		5A6842E81B1C251F00D289D8 /* Button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button.png; sourceTree = "<group>"; };
 		5A7EA6F51B1B6A1300C4F2EB /* DropdownViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DropdownViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A7EA6F91B1B6A1300C4F2EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5A7EA6FA1B1B6A1300C4F2EB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -50,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A6842E31B1C213600D289D8 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +73,7 @@
 		5A7EA6EC1B1B6A1300C4F2EB = {
 			isa = PBXGroup;
 			children = (
+				5A6842E21B1C213600D289D8 /* MapKit.framework */,
 				5A7EA71E1B1B6A1E00C4F2EB /* DropdownView */,
 				5A7EA6F71B1B6A1300C4F2EB /* DropdownViewDemo */,
 				5A7EA7111B1B6A1300C4F2EB /* DropdownViewDemoTests */,
@@ -85,6 +93,8 @@
 		5A7EA6F71B1B6A1300C4F2EB /* DropdownViewDemo */ = {
 			isa = PBXGroup;
 			children = (
+				5A6842E61B1C224300D289D8 /* Header.png */,
+				5A6842E81B1C251F00D289D8 /* Button.png */,
 				5A7EA6FC1B1B6A1300C4F2EB /* AppDelegate.h */,
 				5A7EA6FD1B1B6A1300C4F2EB /* AppDelegate.m */,
 				5A7EA6FF1B1B6A1300C4F2EB /* ViewController.h */,
@@ -213,6 +223,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A6842E91B1C251F00D289D8 /* Button.png in Resources */,
+				5A6842E71B1C224300D289D8 /* Header.png in Resources */,
 				5A7EA7041B1B6A1300C4F2EB /* Main.storyboard in Resources */,
 				5A7EA7091B1B6A1300C4F2EB /* LaunchScreen.xib in Resources */,
 				5A7EA7061B1B6A1300C4F2EB /* Images.xcassets in Resources */,
@@ -431,6 +443,7 @@
 				5A7EA71A1B1B6A1300C4F2EB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5A7EA71B1B1B6A1300C4F2EB /* Build configuration list for PBXNativeTarget "DropdownViewDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -439,6 +452,7 @@
 				5A7EA71D1B1B6A1300C4F2EB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
