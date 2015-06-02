@@ -1,6 +1,6 @@
 //
 //  JCDropDownViewController.m
-//  
+//
 //
 //  Created by JAVIER CALATRAVA LLAVERIA on 31/05/15.
 //
@@ -24,12 +24,13 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     CGPoint startMovingPoint;
     CGPoint finalUpperPoint;
     CGPoint finalLowerPoint;
-    CGPoint currentPlayButtonOrigin;
+    CGPoint currentMovingPoint;
+    CGRect fOriginalFrame;
     
     CGFloat time;
     
     tFoldedState foldedState;
-
+    
     
 }
 
@@ -43,7 +44,7 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     // Do any additional setup after loading the view, typically from a nib.
     
     foldedState=kFullyFolded;
-
+    
     
     [self setupUIControls:nil button:nil];
     
@@ -55,8 +56,15 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
 
 - (void)setupUIControls:(UIView*)aUpperView button:(UIButton*)aButton{
     
+    
+    if(!aButton || !aUpperView)
+        return;
+    
+    
+    
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
+    CGFloat screenWidth = screenSize.width;
     
     
     if(self.svwUpperSubview)
@@ -68,7 +76,6 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         aUpperView.frame=aResizedFrame;
     }
     
-    CGRect aUpperSubviewFrame =(aUpperView)?aUpperView.frame:CGRectMake(0, 0, screenSize.width, screenSize.height*SUBVIEW_HEIGHT);
     self.svwUpperSubview = aUpperView;//[[UIView alloc] initWithFrame:aUpperSubviewFrame];
     
     NSLog(@"%@",NSStringFromCGRect(aUpperView.frame));
@@ -84,14 +91,9 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         
         if(self.btnFoldButton)
             [self.btnFoldButton removeFromSuperview];
-
+        
         self.btnFoldButton=aButton;
-
-    }else{
-        CGRect aButtonFolderFrame =CGRectMake(screenSize.width/2-BUTTON_WIDTH/2, self.svwUpperSubview.frame.size.height-BUTTON_HEIGHT/2, BUTTON_WIDTH, BUTTON_HEIGHT);
-        self.btnFoldButton = [[UIButton alloc] initWithFrame:aButtonFolderFrame];
-        self.btnFoldButton.backgroundColor = [UIColor yellowColor];
-        [self.view addSubview:self.btnFoldButton];
+        
     }
     
     
@@ -101,13 +103,30 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     
     [self.btnFoldButton addTarget:self action:@selector(buttonTouchDownRepeat:event:) forControlEvents:UIControlEventTouchDownRepeat];
     
-    finalLowerPoint=[self getPointFromButton:self.btnFoldButton];
+    
+    fOriginalFrame=self.svwUpperSubview.frame;
+    
+    foldedState=kFullyFolded;
+    
+    
+    
+    finalLowerPoint.x= screenWidth/2-self.btnFoldButton.frame.size.width/2;
+    finalLowerPoint.y=self.svwUpperSubview.frame.size.height;
+    if(self.navigationController)
+        finalLowerPoint.y+=self.navigationController.navigationBar.frame.size.height;
+    
+    
     startMovingPoint = finalLowerPoint;;
-    finalLowerPoint=startMovingPoint;
+    //finalLowerPoint=startMovingPoint;
+    
     finalUpperPoint=startMovingPoint;
     finalUpperPoint.y=MIN_Y_UPPER_MARGIN_POINT;
-    currentPlayButtonOrigin=startMovingPoint;
-
+    if(self.navigationController)
+        finalUpperPoint.y+=self.navigationController.navigationBar.frame.size.height;
+    
+    currentMovingPoint=startMovingPoint;
+    
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -128,6 +147,7 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     }
 }
 
+
 -(CGPoint) getPointFromButton:(UIButton*)aUIButton{
     CGRect screenBound = [[UIScreen mainScreen] bounds];
     CGSize screenSize = screenBound.size;
@@ -136,6 +156,8 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     
     CGPoint aButtonPoint = aUIButton.frame.origin;
     aButtonPoint.x= screenWidth/2-aUIButton.frame.size.width/2;
+    
+    //aButtonPoint.y=self.svwUpperSubview.frame.size.height+self.svwUpperSubview.bounds.origin.y;
     
     return aButtonPoint;
 }
@@ -149,13 +171,13 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         //NSLog(@"%f",ini);
         
         startMovingPoint = [self getPointFromButton:self.btnFoldButton];
-        currentPlayButtonOrigin=startMovingPoint;
+        currentMovingPoint=startMovingPoint;
         
     }
     else if(pan.state == UIGestureRecognizerStateEnded)
     {
         // NSLog(@"End");
-        startMovingPoint=currentPlayButtonOrigin;
+        startMovingPoint=currentMovingPoint;
         //NSLog(@"startMovingPoint:%@",NSStringFromCGPoint(startMovingPoint));
         return;
         
@@ -174,41 +196,49 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     
     
     if(offset<0)
-        currentPlayButtonOrigin = [self getNewPointForOffset:offset
-                                                 withInitial:startMovingPoint
-                                                    andFinal:finalUpperPoint];
+        currentMovingPoint = [self getNewPointForOffset:offset
+                                            withInitial:startMovingPoint
+                                               andFinal:finalUpperPoint];
     else
-        currentPlayButtonOrigin = [self getNewPointForOffset:offset
-                                                 withInitial:startMovingPoint
-                                                    andFinal:finalLowerPoint];
+        currentMovingPoint = [self getNewPointForOffset:offset
+                                            withInitial:startMovingPoint
+                                               andFinal:finalLowerPoint];
     
-    if(isnan(currentPlayButtonOrigin.x) || isnan(currentPlayButtonOrigin.y))
+    if(isnan(currentMovingPoint.x) || isnan(currentMovingPoint.y))
         return;
     
     // NSLog(@"currentPlayButtonOrigin:%@",NSStringFromCGPoint(currentPlayButtonOrigin));
     
     
-    if(currentPlayButtonOrigin.y < finalUpperPoint.y){
-        currentPlayButtonOrigin=finalUpperPoint;//return;// [self goToFinal:YES];
+    if(currentMovingPoint.y < finalUpperPoint.y){
+        currentMovingPoint=finalUpperPoint;//return;// [self goToFinal:YES];
         foldedState=kFullyUnfolded;
     }
-    else if(currentPlayButtonOrigin.y > finalLowerPoint.y){
-        currentPlayButtonOrigin=finalLowerPoint;//return;//   [self goToInitial:YES];
+    else if(currentMovingPoint.y > finalLowerPoint.y){
+        currentMovingPoint=finalLowerPoint;//return;//   [self goToInitial:YES];
         foldedState=kFullyFolded;
     }
     else
     {
         foldedState=kMidleFolded;
         
-        [self move:self.btnFoldButton toOrigin:currentPlayButtonOrigin withAlpha:1.0 animated:NO withCompletion:nil];
-        [self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:NO];
+        [self move:self.btnFoldButton toOrigin:currentMovingPoint withAlpha:1.0 animated:NO withCompletion:nil];
+        //[self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:NO];
+        
+        
+        CGFloat fHeight=self.btnFoldButton.center.y-self.btnFoldButton.frame.size.height/2;
+        
+        if(self.navigationController)
+            fHeight-=self.navigationController.navigationBar.frame.size.height;
+        
+        [self shrinkView:self.svwUpperSubview height:fHeight  animated:NO];
         
     }
     
 }
 
 
--(void) shrinkView:(UIView*)aView foldButton:(UIButton*)foldButton animated:(BOOL)animated{
+-(void) shrinkView:(UIView*)aView height:(CGFloat)height animated:(BOOL)animated{
     
     
     
@@ -217,18 +247,21 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         
         [UIView  animateWithDuration:time animations:^{
             CGRect aViewFrame = aView.frame;
-            aViewFrame.size.height = foldButton.center.y;
+            aViewFrame.size.height = height;
+            
             aView.frame=aViewFrame;
         } completion:nil];
     }
     else
     {
         CGRect aViewFrame = aView.frame;
-        aViewFrame.size.height = foldButton.center.y;
+        aViewFrame.size.height = height;
         aView.frame=aViewFrame;
     }
     
 }
+
+
 
 
 - (void)goToLowerFinalPoint:(BOOL)animated
@@ -238,7 +271,9 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         
     }];
     
-    [self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:animated];
+    //[self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:animated];
+    CGFloat fHeight=fOriginalFrame.size.height;
+    [self shrinkView:self.svwUpperSubview height:fHeight  animated:animated];
     
     foldedState=kFullyFolded;
 }
@@ -248,10 +283,10 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     
     
     [self move:self.btnFoldButton  toOrigin:finalUpperPoint withAlpha:1.0 animated:animated withCompletion:^{
-        // [playButton setModeHidde];
     }];
     
-    [self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:animated];
+    CGFloat fHeight=MIN_Y_UPPER_MARGIN_POINT;
+    [self shrinkView:self.svwUpperSubview height:fHeight  animated:animated];
     
     foldedState=kFullyUnfolded;
     
@@ -269,19 +304,27 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     
     CGFloat velocity = NowPlayingAnimationVelocity;
     CGPoint currentOrigin = view.frame.origin;
-    CGFloat distance = (currentOrigin.y > origin.y) ? currentOrigin.y-origin.y : origin.y-currentOrigin.y;
+    CGFloat distance;
+    
+    
+    if(currentOrigin.y > origin.y)
+        distance=currentOrigin.y-origin.y;
+    else
+        distance= origin.y-currentOrigin.y;
     
     time = 1/velocity * distance;
     
     CGRect f = view.frame;
     f.origin = origin;
+    if(!self.navigationController)
+        f.origin.y -= view.frame.size.height/2;
+    
     
     if(animated)
     {
         [UIView animateWithDuration:time animations:^{
             view.frame = f;
             view.alpha = alpha;
-            //            self.fadeOutBackgroundView.alpha=alpha;
         } completion:^(BOOL finished) {
             if(completion)
                 completion();
@@ -291,7 +334,6 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
     {
         view.frame = f;
         view.alpha = alpha;
-        //        self.fadeOutBackgroundView.alpha=alpha;
         if(completion)
             completion();
     }
