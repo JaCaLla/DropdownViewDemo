@@ -226,7 +226,7 @@ typedef enum {kFullyFolded=0,kMidleFolded,kFullyUnfolded} tFoldedState;
         //[self shrinkView:self.svwUpperSubview foldButton:self.btnFoldButton animated:NO];
         
         
-        CGFloat fHeight=self.btnFoldButton.center.y-self.btnFoldButton.frame.size.height/2;
+        CGFloat fHeight=self.btnFoldButton.center.y;
         
         if(self.navigationController)
             fHeight-=self.navigationController.navigationBar.frame.size.height;
